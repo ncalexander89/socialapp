@@ -2,6 +2,9 @@
 
 <%= link_to "New Post", new_post_path, class: "btn btn-primary" %>
 
+<%# <%= link_to "Followers", follow_request_path, class: "btn btn-primary" %>
+
+
 <% @posts.each do |post| %>
 
   <div style="margin-bottom: 2em; padding: 1em; border: 1px solid #ccc;">
@@ -42,7 +45,11 @@
     </div>
 
   </div>
+<% end %>
 
 <%= button_to "Log out", destroy_user_session_path, method: :delete %>
 
-<% end %>
+<%= link_to "Followers", follow_requests_path, class: "btn btn-primary" %>
+
+<%= link_to "All Users", users_path, class: "btn btn-primary" %>
+

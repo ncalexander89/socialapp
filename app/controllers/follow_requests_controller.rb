@@ -1,6 +1,11 @@
 class FollowRequestsController < ApplicationController
   before_action :authenticate_user!
 
+  def index
+    @pending_requests = current_user.received_follow_requests.where(status: "pending")
+  end
+  
+
   def create
     @follow_request = current_user.sent_follow_requests.build(receiver_id: params[:receiver_id], status: "pending")
     if @follow_request.save
@@ -12,10 +17,10 @@ class FollowRequestsController < ApplicationController
 
   def update
     @follow_request = current_user.received_follow_requests.find(params[:id])
-    if @follow_request.update(status: params[:status])
-      redirect_to follow_requests_path, notice: "Follow request #{params[:status]}!"
+    if @follow_request.update(follow_request_params)
+      redirect_to users_path, notice: "Follow request #{follow_request_params[:status]}!"
     else
-      redirect_to follow_requests_path, alert: "Unable to update request."
+      redirect_to users_path, alert: "Unable to update request."
     end
   end
 end

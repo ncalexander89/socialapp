@@ -1,0 +1,33 @@
+<h2>Pending Follow Requests</h2>
+
+<% @pending_requests.each do |request| %>
+  <p>
+    <%= request.sender.email %> wants to follow you.
+    <%= button_to "Accept", follow_request_path(request), method: :patch,
+          params: { follow_request: { status: "accepted" } }, class: "btn btn-success" %>
+
+    <%= button_to "Reject", follow_request_path(request), method: :patch,
+          params: { follow_request: { status: "rejected" } }, class: "btn btn-danger" %>
+  </p>
+<% end %>
+
+<h2>Follow Requests You Sent</h2>
+
+<% current_user.sent_follow_requests.each do |request| %>
+  <p>
+    To: <%= request.receiver.email %> — Status: <%= request.status %>
+  </p>
+<% end %>
+
+<h2>Follow Requests You Received</h2>
+
+<% current_user.received_follow_requests.each do |request| %>
+  <p>
+    From: <%= request.sender.email %> — Status: <%= request.status %>
+  </p>
+<% end %>
+
+<%= button_to "Log out", destroy_user_session_path, method: :delete %>
+<%= link_to "All Posts", root_path, class: "btn btn-primary" %>
+<%= link_to "All Users", users_path, class: "btn btn-primary" %>
+<%= link_to "Followers", follow_requests_path, class: "btn btn-primary" %>
