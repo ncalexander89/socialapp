@@ -1,0 +1,31 @@
+<h1>All Users</h1>
+
+<% @users.each do |user| %>
+  <div style="border: 1px solid #ccc; padding: 1em; margin-bottom: 1em;">
+    <%= avatar_for(user, size: 60) %>
+    <p>
+      <strong><%= link_to(user.name.presence || user.email, user_path(user)) %></strong>
+    </p>
+
+    <% if current_user.following.include?(user) %>
+      <p style="color: green;">✔ You are following</p>
+
+    <% elsif current_user.sent_follow_requests.exists?(receiver_id: user.id, status: "pending") %>
+      <p style="color: orange;">⏳ Follow request pending</p>
+
+    <% else %>
+      <%= button_to "Follow", follow_requests_path(receiver_id: user.id), method: :post, class: "btn btn-primary" %>
+    <% end %>
+  </div>
+<% end %>
+
+<h2>Pending Follow Requests</h2>
+
+<% current_user.received_follow_requests.where(status: "pending").each do |request| %>
+  <p>
+    <%= request.sender.email %> wants to follow you.
+    <%= button_to "Accept", follow_request_path(request), method: :patch, params: { follow_request: { status: "accepted" } } %>
+    <%= button_to "Reject", follow_request_path(request), method: :patch, params: { follow_request: { status: "rejected" } } %>
+  </p>
+<% end %>
+

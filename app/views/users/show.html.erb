@@ -1,0 +1,55 @@
+<h1><%= @user.name.presence || @user.email %>'s Profile</h1>
+
+<!-- Profile Picture -->
+<p>
+  <%= avatar_for(@user, size: 100) %>
+</p>
+
+<!-- Bio -->
+<p><strong>Bio:</strong> <%= @user.bio.presence || "No bio provided." %></p>
+
+<!-- (Optional) Follow/Unfollow Button -->
+<% unless @user == current_user %>
+  <% if current_user.following.include?(@user) %>
+    <span>✔ You follow this user</span>
+  <% elsif current_user.sent_follow_requests.exists?(receiver_id: @user.id, status: "pending") %>
+    <span>⏳ Follow request sent</span>
+  <% else %>
+    <%= button_to "Follow", follow_requests_path(receiver_id: @user.id), method: :post %>
+  <% end %>
+<% end %>
+
+<hr>
+
+<h2>Posts by <%= @user.name.presence || @user.email %>:</h2>
+
+<% @posts.each do |post| %>
+  <div style="border: 1px solid #ccc; padding: 1em; margin-bottom: 1em;">
+    <p><%= post.content %></p>
+    <p><small><%= time_ago_in_words(post.created_at) %> ago</small></p>
+
+    <!-- Likes -->
+    <p>
+      <strong><%= pluralize(post.likes.count, "like") %></strong>
+      <% if current_user.likes.exists?(post_id: post.id) %>
+        <%= button_to "Unlike", post_like_path(post), method: :delete %>
+      <% else %>
+        <%= button_to "Like", post_like_path(post), method: :post %>
+      <% end %>
+    </p>
+
+    <!-- Comments -->
+    <div>
+      <strong>Comments:</strong>
+      <% post.comments.each do |comment| %>
+        <p><strong><%= comment.user.email %>:</strong> <%= comment.content %></p>
+      <% end %>
+
+      <!-- Comment form -->
+      <%= form_with model: [post, Comment.new], local: true do |f| %>
+        <%= f.text_field :content, placeholder: "Add a comment...", size: 50 %>
+        <%= f.submit "Comment" %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
